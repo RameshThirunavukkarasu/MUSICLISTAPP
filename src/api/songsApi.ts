@@ -1,10 +1,11 @@
 import { Song, SongsApiResponse } from '../types/song';
 
 const ITUNES_API_BASE_URL = 'https://itunes.apple.com/search';
+const ITEMS_PER_PAGE = 20;
 
-export const fetchSongs = async (): Promise<Song[]> => {
+export const fetchSongs = async (offset: number = 0): Promise<Song[]> => {
   try {
-    const url = `${ITUNES_API_BASE_URL}?term=arijit&entity=song&limit=25`;
+    const url = `${ITUNES_API_BASE_URL}?term=arijit&entity=song&limit=${ITEMS_PER_PAGE}&offset=${offset}`;
     const response = await fetch(url);
 
     if (!response.ok) {
