@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, ScrollView } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
+import DownloadButton from '../../components/DownloadButton';
 import { styles } from './SongDetailsScreen.styles';
 
 type SongDetailsScreenRouteProp = RouteProp<RootStackParamList, 'SongDetails'>;
@@ -36,7 +37,10 @@ const SongDetailsScreen: React.FC<SongDetailsScreenProps> = ({ route }) => {
           style={styles.thumbnail}
           resizeMode="cover"
         />
-        <Text style={styles.title}>{song.trackName}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{song.trackName}</Text>
+          <DownloadButton song={song} />
+        </View>
         <Text style={styles.artist}>{song.artistName}</Text>
 
         <View style={styles.infoRow}>

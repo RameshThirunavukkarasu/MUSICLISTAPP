@@ -27,11 +27,18 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   trackName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 4,
+    flex: 1,
+    marginRight: 8,
   },
   artistName: {
     fontSize: 14,
@@ -42,6 +49,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
   genre: {
     fontSize: 12,

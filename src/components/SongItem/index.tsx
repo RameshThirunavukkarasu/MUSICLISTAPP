@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { Song } from '../../types/song';
+import DownloadButton from '../DownloadButton';
 import { styles } from './SongItem.styles';
 
 interface SongItemProps {
@@ -23,9 +24,12 @@ const SongItem: React.FC<SongItemProps> = ({ song, onPress }) => {
         resizeMode="cover"
       />
       <View style={styles.infoContainer}>
-        <Text style={styles.trackName} numberOfLines={1}>
-          {song.trackName}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.trackName} numberOfLines={1}>
+            {song.trackName}
+          </Text>
+          <DownloadButton song={song} size="small" />
+        </View>
         <Text style={styles.artistName} numberOfLines={1}>
           {song.artistName}
         </Text>

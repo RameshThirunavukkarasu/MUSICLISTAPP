@@ -14,11 +14,18 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 8,
+    flex: 1,
+    marginRight: 8,
   },
   artist: {
     fontSize: 18,
