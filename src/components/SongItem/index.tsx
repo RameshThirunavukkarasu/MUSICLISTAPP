@@ -7,9 +7,10 @@ import { styles } from './SongItem.styles';
 interface SongItemProps {
   song: Song;
   onPress: () => void;
+  refreshKey?: number;
 }
 
-const SongItem: React.FC<SongItemProps> = ({ song, onPress }) => {
+const SongItem: React.FC<SongItemProps> = ({ song, onPress, refreshKey }) => {
   const formatDuration = (millis: number) => {
     const minutes = Math.floor(millis / 60000);
     const seconds = Math.floor((millis % 60000) / 1000);
@@ -28,7 +29,7 @@ const SongItem: React.FC<SongItemProps> = ({ song, onPress }) => {
           <Text style={styles.trackName} numberOfLines={1}>
             {song.trackName}
           </Text>
-          <DownloadButton song={song} size="small" />
+          <DownloadButton song={song} size="small" refreshKey={refreshKey} />
         </View>
         <Text style={styles.artistName} numberOfLines={1}>
           {song.artistName}

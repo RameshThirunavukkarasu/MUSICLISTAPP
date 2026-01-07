@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, ScrollView } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import DownloadButton from '../../components/DownloadButton';
 import { styles } from './SongDetailsScreen.styles';
@@ -13,6 +13,13 @@ interface SongDetailsScreenProps {
 
 const SongDetailsScreen: React.FC<SongDetailsScreenProps> = ({ route }) => {
   const { song } = route.params;
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshKey(prev => prev + 1);
+    }, [])
+  );
 
   const formatDuration = (millis: number) => {
     const minutes = Math.floor(millis / 60000);
@@ -39,7 +46,7 @@ const SongDetailsScreen: React.FC<SongDetailsScreenProps> = ({ route }) => {
         />
         <View style={styles.titleRow}>
           <Text style={styles.title}>{song.trackName}</Text>
-          <DownloadButton song={song} />
+          <DownloadButton song={song} refreshKey={refreshKey} />
         </View>
         <Text style={styles.artist}>{song.artistName}</Text>
 

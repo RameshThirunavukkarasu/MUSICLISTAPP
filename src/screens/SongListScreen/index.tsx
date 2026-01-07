@@ -6,7 +6,7 @@ import {
   Text,
   RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { fetchSongs } from '../../api/songsApi';
 import { Song } from '../../types/song';
@@ -24,6 +24,13 @@ const SongListScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      setRefreshKey(prev => prev + 1);
+    }, [])
+  );
 
   const loadSongs = useCallback(
     async (currentOffset: number, isRefresh: boolean = false) => {
@@ -35,10 +42,12 @@ const SongListScreen: React.FC = () => {
 
         if (newSongs.length === 0) {
           setHasMore(false);
+          setLoading(false);
         } else {
           if (isRefresh) {
             setSongs(newSongs);
             setOffset(newSongs.length);
+            setHasMore(true);
           } else {
             setSongs((prev) => {
               const existingIds = new Set(prev.map((song) => song.trackId));
@@ -49,11 +58,12 @@ const SongListScreen: React.FC = () => {
             });
             setOffset(currentOffset + newSongs.length);
           }
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error loading songs:', error);
-      } finally {
         setLoading(false);
+      } finally {
         setRefreshing(false);
       }
     },
@@ -65,7 +75,7 @@ const SongListScreen: React.FC = () => {
   }, [loadSongs]);
 
   const handleLoadMore = () => {
-    if (!loading && hasMore) {
+    if (!loading && hasMore && songs.length > 0) {
       loadSongs(offset);
     }
   };
@@ -82,19 +92,19 @@ const SongListScreen: React.FC = () => {
   };
 
   const renderSongItem = ({ item }: { item: Song }) => (
-    <SongItem song={item} onPress={() => handleSongPress(item)} />
+    <SongItem song={item} onPress={() => handleSongPress(item)} refreshKey={refreshKey} />
   );
 
   const renderFooter = () => {
-    if (loading) {
+    if (!hasMore && songs.length > 0) {
+      return <EndOfList />;
+    }
+    if (loading && hasMore) {
       return (
         <View style={styles.footerLoader}>
           <ActivityIndicator size="small" color="#6200ee" />
         </View>
       );
-    }
-    if (!hasMore && songs.length > 0) {
-      return <EndOfList />;
     }
     return null;
   };

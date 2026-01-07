@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Song } from '../../types/song';
@@ -8,28 +8,34 @@ import { styles } from './DownloadButton.styles';
 interface DownloadButtonProps {
   song: Song;
   size?: 'small' | 'default';
+  onDownloadStatusChange?: (isDownloaded: boolean) => void;
+  refreshKey?: number;
 }
 
-const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' }) => {
+const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default', onDownloadStatusChange, refreshKey }) => {
   const [downloading, setDownloading] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
 
-  useEffect(() => {
-    checkDownloadStatus();
-  }, [song]);
-
-  const checkDownloadStatus = async () => {
+  const checkDownloadStatus = useCallback(async () => {
     try {
       const downloaded = await isSongDownloaded(song);
       setIsDownloaded(downloaded);
+      onDownloadStatusChange?.(downloaded);
     } catch (error) {
       console.error('Error checking download status:', error);
       setIsDownloaded(false);
+      onDownloadStatusChange?.(false);
     }
-  };
+  }, [song, onDownloadStatusChange]);
+
+  useEffect(() => {
+    checkDownloadStatus();
+  }, [checkDownloadStatus, refreshKey]);
 
   const handlePress = async () => {
-    if (downloading || isDownloaded) return;
+    if (downloading || isDownloaded) {
+      return;
+    }
 
     if (!song.previewUrl) {
       Alert.alert('Error', 'No song available');
@@ -40,6 +46,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' 
       setDownloading(true);
       const filePath = await downloadSong(song);
       setIsDownloaded(true);
+      onDownloadStatusChange?.(true);
       
       const friendlyPath = filePath.includes('Download') 
         ? 'Downloads/MusicListApp folder'
@@ -69,9 +76,13 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' 
 
   return (
     <TouchableOpacity 
-      style={[styles.iconButton, isDownloaded && styles.iconButtonDisabled]} 
+      style={[
+        styles.iconButton, 
+        isDownloaded && styles.iconButtonDisabled,
+        isDisabled && styles.iconButtonDisabled
+      ]} 
       onPress={handlePress} 
-      activeOpacity={isDownloaded ? 1 : 0.7}
+      activeOpacity={isDisabled ? 1 : 0.7}
       disabled={isDisabled}
     >
       {downloading ? (
