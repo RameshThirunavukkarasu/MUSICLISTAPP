@@ -1,7 +1,11 @@
 import RNFS from 'react-native-fs';
-import {Song} from '../types/song';
+import { Song } from '../types/song';
 
-const MUSIC_FOLDER = `${RNFS.DocumentDirectoryPath}/Music`;
+const getMusicFolder = (): string => {
+  return `${RNFS.DownloadDirectoryPath}/MusicListApp`;
+};
+
+const MUSIC_FOLDER = getMusicFolder();
 
 const isMusicDirectory = async (): Promise<void> => {
   const exists = await RNFS.exists(MUSIC_FOLDER);
@@ -47,7 +51,6 @@ export const downloadSong = async (song: Song): Promise<string> => {
   return filePath;
 };
 
-
 export const isSongDownloaded = async (song: Song): Promise<boolean> => {
   try {
     const filePath = getSongFilePath(song);
@@ -57,8 +60,6 @@ export const isSongDownloaded = async (song: Song): Promise<boolean> => {
   }
 };
 
-
 export const getDownloadedSongsPath = (): string => {
   return MUSIC_FOLDER;
 };
-
