@@ -1,7 +1,8 @@
-import React from 'react';
-import { TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Song } from '../../types/song';
+import { downloadSong } from '../../utils/downloadManager';
 import { styles } from './DownloadButton.styles';
 
 interface DownloadButtonProps {
@@ -10,8 +11,33 @@ interface DownloadButtonProps {
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' }) => {
-  const handlePress = () => {
-    console.log(song);
+  const [downloading, setDownloading] = useState(false);
+
+  const handlePress = async () => {
+    if (downloading) return;
+
+    if (!song.previewUrl) {
+      Alert.alert('Error', 'No Sog available');
+      return;
+    }
+
+    try {
+      setDownloading(true);
+      const filePath = await downloadSong(song);
+      Alert.alert(
+        'Success',
+        `Song downloaded in: ${filePath}`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      Alert.alert(
+        'Download Failed',
+        error instanceof Error ? error.message : 'Failed to download',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const iconSize = size === 'small' ? 20 : 24;
@@ -21,8 +47,12 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' 
       style={styles.iconButton} 
       onPress={handlePress} 
       activeOpacity={0.7}
+      disabled={downloading}
     >
-      <Svg width={iconSize} height={iconSize} viewBox="0 0 52 52" fill="none">
+      {downloading ? (
+        <ActivityIndicator size="small" color="#5e5c5c" />
+      ) : (
+        <Svg width={iconSize} height={iconSize} viewBox="0 0 52 52" fill="none">
         <Path
           d="M45.501 32.5V41.1673C45.501 42.3167 45.0444 43.419 44.2317 44.2317C43.419 45.0444 42.3167 45.501 41.1673 45.501H10.8317C9.68235 45.501 8.58006 45.0444 7.76735 44.2317C6.95463 43.419 6.49805 42.3167 6.49805 41.1673V32.5"
           stroke="#5e5c5c"
@@ -45,6 +75,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ song, size = 'default' 
           strokeLinejoin="round"
         />
       </Svg>
+      )}
     </TouchableOpacity>
   );
 };
